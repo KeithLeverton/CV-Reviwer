@@ -1,0 +1,17 @@
+﻿@model CVReviewViewModel;
+@{
+    ViewData["Title"] = "CvReview";
+}
+
+<body>
+    <div class="text-">
+        <h1>Here is your review</h1>
+        <p>
+            @foreach (var line in Model.ReviewResponse?.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None) ?? Array.Empty<string>())
+            {
+                @line.Replace("*","")<br />
+            }
+        </p>
+    </div>
+</body>
+
