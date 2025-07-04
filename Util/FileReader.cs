@@ -1,5 +1,7 @@
 ﻿using iText.Kernel.Pdf;
 using System.Text;
+using DocumentFormat.OpenXml;
+
 namespace CV_Rater.Util
 {
     public static class FileReader
@@ -12,9 +14,9 @@ namespace CV_Rater.Util
             }
             using (var stream = file.OpenReadStream())
             {
-                using (var reader = new iText.Kernel.Pdf.PdfReader(stream))
+                using (var reader = new PdfReader(stream))
                 {
-                    using (var pdfDoc = new iText.Kernel.Pdf.PdfDocument(reader))
+                    using (var pdfDoc = new PdfDocument(reader))
                     {
                         var text = new StringBuilder();
                         for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
@@ -30,5 +32,23 @@ namespace CV_Rater.Util
             }
         }
 
+        public static async Task<string> ReadDocxAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ArgumentException("File is empty or not provided.");
+            }
+            DocumentFormat.OpenXml.Packaging.WordprocessingDocument wordDoc;
+            using (var stream = file.OpenReadStream())
+            {
+                wordDoc = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(stream, false);
+                var text = new StringBuilder();
+                foreach (var paragraph in wordDoc.MainDocumentPart.Document.Body.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>())
+                {
+                    text.AppendLine(paragraph.InnerText);
+                }
+                return text.ToString();
+            }
+        }
     }
 }

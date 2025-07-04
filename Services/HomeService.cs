@@ -32,12 +32,16 @@ namespace CV_Rater.Services
             {
                 return await FileReader.ReadPdfAsync(file);
             }
-            else if(file.Name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            else if(file.FileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     return await reader.ReadToEndAsync();
                 }
+            }
+            else if(file.FileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase) || file.FileName.EndsWith(".doc", StringComparison.OrdinalIgnoreCase))
+            {
+                return await FileReader.ReadDocxAsync(file);
             }
             else
             {
@@ -53,10 +57,6 @@ namespace CV_Rater.Services
             if (file.Length > 10 * 1024 * 1024) // 10 MB limit
             {
                 throw new ArgumentException("File size exceeds the limit of 10 MB.");
-            }
-            if (file.ContentType != "text/plain" && file.ContentType != "application/pdf")
-            {
-                throw new ArgumentException("Unsupported file type. Only text and PDF files are allowed.");
             }
         }
         private string GeneratePrompt(string fileContent)
